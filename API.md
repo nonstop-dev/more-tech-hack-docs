@@ -1,8 +1,10 @@
-# API банковских точек
+# API
 
-## GET api/points
+## Points
 
-### Модель запроса
+### GET api/points
+
+#### Модель запроса
 
 | Имя       | Место | Формат          | Описание               |
 | --------- | ----- | --------------- | ---------------------- |
@@ -10,30 +12,33 @@
 | longitude | query | number($double) | Географическая долгота |
 | radius    | query | number($double) | Радиус (масштаб карты) |
 
-### Модель ответа
+#### Модель ответа
 
 | Код  | Описание              |
 | :--- | :-------------------- |
 | 200  | [Point](#point)[]     |
 | 400  | Bad Request           |
-| 404  | Not Found             |
 | 500  | Internal Server Error |
 
-## GET api/points/{id:guid}
+### GET api/points/{id:guid}
 
-### Модель запроса
+#### Модель запроса
 
 | Имя  | Место | Формат        | Описание     |
 | ---- | ----- | ------------- | ------------ |
 | id   | path  | string($uuid) | Id отделения |
 
-### Модель ответа
+#### Модель ответа
 
-TBD
+| Код  | Описание              |
+| :--- | :-------------------- |
+| 200  | [Point](#point)       |
+| 400  | Bad Request           |
+| 500  | Internal Server Error |
 
-## POST api/points/{id:guid}/book
+### POST api/points/{id:guid}/book
 
-### Модель запроса
+#### Модель запроса
 
 | Имя         | Место | Формат             | Описание     |
 | ----------- | ----- | ------------------ | ------------ |
@@ -41,13 +46,68 @@ TBD
 | time        | body  | string($date-time) | Время        |
 | serviceType | body  | string             | Тип услуги   |
 
-### Модель ответа
+#### Модель ответа
 
 | Код  | Описание              |
 | :--- | :-------------------- |
 | 204  | NoContent             |
 | 400  | Bad Request           |
 | 404  | Not Found             |
+| 500  | Internal Server Error |
+
+### POST api/points/{id:guid}/check
+
+#### Модель запроса
+
+| Имя        | Место | Формат             | Описание                                                  |
+| ---------- | ----- | ------------------ | --------------------------------------------------------- |
+| id         | query | string($uuid)      | Id отделения                                              |
+| time       | body  | string($date-time) | Время в формате ISO-8601 (2023-10-15T13:30:00.000Z)       |
+| clientType | body  | string             | Физическое или юридическое лицо. Значения: Private, Legal |
+
+#### Модель ответа
+
+| Код  | Описание                        |
+| :--- | :------------------------------ |
+| 200  | true - открыто, false - закрыто |
+| 400  | Bad Request                     |
+| 404  | Not Found                       |
+| 500  | Internal Server Error           |
+
+## Atms
+
+### GET api/atms
+
+#### Модель запроса
+
+| Имя       | Место | Формат          | Описание               |
+| --------- | ----- | --------------- | ---------------------- |
+| latitude  | query | number($double) | Географическая широта  |
+| longitude | query | number($double) | Географическая долгота |
+| radius    | query | number($double) | Радиус (масштаб карты) |
+
+#### Модель ответа
+
+| Код  | Описание              |
+| :--- | :-------------------- |
+| 200  | [Atm](#atm)[]         |
+| 400  | Bad Request           |
+| 500  | Internal Server Error |
+
+### GET api/points/{id:guid}
+
+#### Модель запроса
+
+| Имя  | Место | Формат        | Описание     |
+| ---- | ----- | ------------- | ------------ |
+| id   | path  | string($uuid) | Id банкомата |
+
+#### Модель ответа
+
+| Код  | Описание              |
+| :--- | :-------------------- |
+| 200  | [Atm](#atm)           |
+| 400  | Bad Request           |
 | 500  | Internal Server Error |
 
 ## Модели
@@ -76,10 +136,38 @@ TBD
 
 ### OpenHour
 
-| Имя   | Тип    | Описание |
-| ----- | ------ | -------- |
-| days  | string |          |
-| hours | string |          |
+| Имя   | Тип    | Описание    |
+| ----- | ------ | ----------- |
+| days  | string | День недели |
+| hours | string | Часы работы |
 
+### Atm
 
+| Имя       | Тип                   | Описание               |
+| --------- | --------------------- | ---------------------- |
+| id        | string($uuid)         | Id банкомата           |
+| address   | string                | Адрес                  |
+| latitude  | number($double)       | Географическая широта  |
+| longitude | number($double)       | Географическая долгота |
+| allDay    | boolean               | Круглосуточно или нет  |
+| services  | [Services](#services) | Доступность сервисов   |
 
+### Services
+
+| Имя               | Тип                               |
+| ----------------- | --------------------------------- |
+| Wheelchair        | [ServiceSupport](#servicesupport) |
+| Blind             | [ServiceSupport](#servicesupport) |
+| NfcForBankCards   | [ServiceSupport](#servicesupport) |
+| QrRead            | [ServiceSupport](#servicesupport) |
+| SupportsUsd       | [ServiceSupport](#servicesupport) |
+| SupportsChargeRub | [ServiceSupport](#servicesupport) |
+| SupportsEur       | [ServiceSupport](#servicesupport) |
+| SupportsRub       | [ServiceSupport](#servicesupport) |
+
+### ServiceSupport
+
+| Имя               | Тип    |
+| ----------------- | ------ |
+| ServiceCapability | string |
+| ServiceActivity   | string |
